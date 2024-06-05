@@ -301,6 +301,14 @@ def pretrain(train_valid_test_dataset_provider,
                                    iteration, process_non_loss_data_func, config,
                                    verbose=True, write_to_tensorboard=not args.skip_train)
 
+    # Flush TensorBoard and WandB writers.
+    writer = get_tensorboard_writer()
+    if writer:
+        writer.flush()
+    wandb_writer = get_wandb_writer()
+    if wandb_writer:
+        wandb_writer.finish()
+
     maybe_finalize_async_save(blocking=True)
 
 
@@ -1176,14 +1184,6 @@ def train(forward_step_func, model, optimizer, opt_param_scheduler,
                 gc.collect()
 
     track_e2e_metrics()
-
-    # Flush TensorBoard and WandB writers.
-    writer = get_tensorboard_writer()
-    if writer:
-        writer.flush()
-    wandb_writer = get_wandb_writer()
-    if wandb_writer:
-        wandb_writer.finish()
 
     # Close out pre-hooks if using distributed optimizer and overlapped param gather.
     if args.use_distributed_optimizer and args.overlap_param_gather:
