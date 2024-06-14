@@ -15,7 +15,7 @@ export NVTE_FLASH_ATTN=0
 export WANDB_ENTITY=retrieva-research
 export WANDB_API_KEY=c08d60925405462e3de7c213d6a188810af61457 #jnishi
 
-CHECKPOINT_PATH=/workspace/checkpoints/v3
+CHECKPOINT_PATH=/workspace/checkpoints/test
 DATA_PREFIX=/workspace/datasets
 DATA_PATH="1 ${DATA_PREFIX}/code_stack_text_document 1 ${DATA_PREFIX}/ja_cc_text_document 1 ${DATA_PREFIX}/ko_wiki_text_document 1 ${DATA_PREFIX}/refinedweb_content_document 1 ${DATA_PREFIX}/zh_wiki_text_document"
 TOKENIZER_MODEL=/workspace/tokenizer/models/ver3.0/llm-jp-tokenizer-100k.ver3.0b1.model
@@ -32,11 +32,11 @@ NNODES=1
 NODE_RANK=0
 WORLD_SIZE=$(($GPUS_PER_NODE*$NNODES))
 
-WANDB_PROJECT_NAME="bert-128"
+#WANDB_PROJECT_NAME="bert-128"
 #WANDB_PROJECT_NAME="bert-256"
 #WANDB_PROJECT_NAME="bert-512"
 #WANDB_PROJECT_NAME="bert-1024"
-#WANDB_PROJECT_NAME="temp-7-local"
+WANDB_PROJECT_NAME="temp-7-local"
 
 
 DISTRIBUTED_ARGS="
@@ -51,10 +51,10 @@ BERT_ARGS="
     --num-layers 48 \
     --hidden-size 1536 \
     --num-attention-heads 24 \
-    --seq-length 128 \
+    --seq-length 2048 \
     --max-position-embeddings 2048 \
-    --micro-batch-size 128 \
-    --global-batch-size 1024 \
+    --micro-batch-size 8 \
+    --global-batch-size 32 \
     --lr 0.0001 \
     --train-iters $TRAIN_ITERS \
     --lr-decay-iters 450000 \
@@ -89,7 +89,7 @@ DATA_ARGS="
 
 OUTPUT_ARGS="
     --log-interval 10 \
-    --save-interval 10000 \
+    --save-interval 1000 \
     --eval-interval 1000 \
     --eval-iters 10 \
     --wandb-project megatron-bert \

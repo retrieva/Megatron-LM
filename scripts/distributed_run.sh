@@ -1,12 +1,12 @@
 #!/bin/sh
 
 #$ -cwd
-#$ -l node_f=2
-#$ -l h_rt=24:00:00
+#$ -l node_f=8
+#$ -l h_rt=6:00:00
 #$ -N retrieva-mlm
 #$ -m abe
-#$ -o /gs/bs/tge-mc2406/retrieva/logs/stdout.txt
-#$ -e /gs/bs/tge-mc2406/retrieva/logs/stderr.txt
+#$ -o /gs/bs/tge-mc2406/retrieva/logs/stdout_dist.txt
+#$ -e /gs/bs/tge-mc2406/retrieva/logs/stderr_dist.txt
 #$ -M jiro.nishitoba@retrieva.jp
 
 module load cuda
@@ -24,13 +24,12 @@ DATA_PATH="1 ${DATA_PREFIX}/code_stack_text_document 1 ${DATA_PREFIX}/ja_cc_text
 TOKENIZER_MODEL=/workspace/tokenizer/models/ver3.0/llm-jp-tokenizer-100k.ver3.0b1.model
 WADB_DIR=./wandb_dir
 
-#TRAIN_ITERS=1000000
-TRAIN_ITERS=100
+TRAIN_ITERS=1000000
 
 GPUS_PER_NODE=4
 # Change for multinode config
 MASTER_ADDR=$(hostname -i)
-NNODES=2
+NNODES=8
 NODE_RANK=0
 WORLD_SIZE=$(($GPUS_PER_NODE*$NNODES))
 RDZV_PORT=$(expr ${JOB_ID} % 50000 + 10000)
@@ -42,8 +41,8 @@ echo "Master node: ${HOSTNAME}($MASTER_IP_ADDR)"
 #WANDB_PROJECT_NAME="bert-128"
 #WANDB_PROJECT_NAME="bert-256"
 #WANDB_PROJECT_NAME="bert-512"
-#WANDB_PROJECT_NAME="bert-1024"
-WANDB_PROJECT_NAME="temp-7-local"
+WANDB_PROJECT_NAME="bert-2048"
+#WANDB_PROJECT_NAME="temp-7-local"
 
 
 DISTRIBUTED_ARGS="
@@ -59,10 +58,10 @@ BERT_ARGS="
     --num-layers 48 \
     --hidden-size 1536 \
     --num-attention-heads 24 \
-    --seq-length 128 \
+    --seq-length 2048 \
     --max-position-embeddings 2048 \
-    --micro-batch-size 256 \
-    --global-batch-size 2048 \
+    --micro-batch-size 8 \
+    --global-batch-size 1024\
     --lr 0.0001 \
     --train-iters $TRAIN_ITERS \
     --lr-decay-iters 450000 \
@@ -97,8 +96,8 @@ DATA_ARGS="
 
 OUTPUT_ARGS="
     --log-interval 10 \
-    --save-interval 10000 \
-    --eval-interval 1000 \
+    --save-interval 500 \
+    --eval-interval 500 \
     --eval-iters 10 \
     --wandb-project megatron-bert \
     --wandb-exp-name $WANDB_PROJECT_NAME \
