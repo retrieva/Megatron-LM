@@ -62,6 +62,7 @@ def model_provider(pre_process=True, post_process=True):
             share_embeddings_and_output_weights=not args.untie_embeddings_and_output_weights,
             parallel_output=True,
             pre_process=pre_process,
+            position_embedding_type='rope' if args.position_embedding_type=='rope' else 'learned_absolute',
             post_process=post_process)
 
     return model

@@ -1354,14 +1354,11 @@ def train(forward_step_func, model, optimizer, opt_param_scheduler,
 
     one_logger_utils.track_e2e_metrics()
 
-<<<<<<< HEAD
-=======
     # Flush TensorBoard, WandB writers and one-logger
     writer = get_tensorboard_writer()
     if writer:
         writer.flush()
 
->>>>>>> nvidia/main
     # Close out pre-hooks if using distributed optimizer and overlapped param gather.
     if args.use_distributed_optimizer and args.overlap_param_gather:
         optimizer.disable_pre_hook()
